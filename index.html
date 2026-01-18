@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منصة مجموع - منصة الاستبيانات والبحوث العلمية</title>
+    <meta name="description" content="منصة رقمية لنشر ومشاركة الاستبيانات والبحوث العلمية">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo-link">
+                <img src="colorfulLogo.png" alt="منصة مجموع" class="logo-img">
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h2 class="hero-title">نُيسّر للبَاحِثين تَجميع عَيناتِهم البَحثية</h2>
+                <p class="hero-slogan">بشكل دقيق، مباشر، واضح، سهل ومحسوب</p>
+                <p class="hero-description">بأيدي سعودية خالصة</p>
+                <a href="request.html" class="btn btn-primary">اطلب نشر استبيان</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section -->
+    <section class="categories-section">
+        <div class="container">
+            <h3 class="section-title">تصنيفات الاستبيانات</h3>
+            <div class="categories-tabs" id="categoriesTabs">
+                <button class="category-tab active" data-category="all">الكل</button>
+                <!-- التصنيفات الديناميكية ستُضاف هنا من قاعدة البيانات -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Surveys Section -->
+    <section class="surveys-section">
+        <div class="container">
+            <div class="surveys-grid" id="surveysGrid">
+                <!-- بطاقات الاستبيانات ستُضاف هنا ديناميكيًا -->
+                <div class="loading">جاري تحميل الاستبيانات...</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+        <div class="container">
+            <h3 class="section-title">تواصل معنا</h3>
+            <form class="contact-form" id="contactForm">
+                <div class="form-group">
+                    <label for="contactName">الاسم</label>
+                    <input type="text" id="contactName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactEmail">البريد الإلكتروني</label>
+                    <input type="email" id="contactEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="contactMessage">الرسالة</label>
+                    <textarea id="contactMessage" name="message" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">إرسال الرسالة</button>
+            </form>
+            <div class="message" id="contactMessage"></div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>جميع الحقوق محفوظة لمجموع  <span id="currentYear"></span> &copy;</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Main JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

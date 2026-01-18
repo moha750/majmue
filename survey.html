@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعادة توجيه - منصة مجموع</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .redirect-container {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        .redirect-content {
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+        }
+        .redirect-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .redirect-title {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: var(--text-color);
+        }
+        .redirect-message {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 1rem 0;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error-icon {
+            color: var(--danger-color);
+        }
+        .success-icon {
+            color: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo-link">
+                <img src="colorfulLogo.png" alt="منصة مجموع" class="logo-img">
+            </a>
+        </div>
+    </header>
+
+    <!-- Redirect Container -->
+    <section class="redirect-container">
+        <div class="redirect-content" id="redirectContent">
+            <div class="loading-spinner"></div>
+            <h2 class="redirect-title">جاري التحميل...</h2>
+            <p class="redirect-message">يرجى الانتظار، جاري إعادة توجيهك إلى الاستبيان</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>جميع الحقوق محفوظة لمجموع  <span id="currentYear"></span> &copy;</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/survey.js"></script>
+</body>
+</html>

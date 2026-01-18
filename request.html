@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طلب نشر استبيان - منصة مجموع</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo-link">
+                <img src="colorfulLogo.png" alt="منصة مجموع" class="logo-img">
+            </a>
+        </div>
+    </header>
+
+    <!-- Request Form Section -->
+    <section class="request-section">
+        <div class="container">
+            <div class="request-container">
+                <h2 class="page-title">طلب نشر استبيان</h2>
+                <p class="page-description">املأ النموذج التالي لطلب نشر استبيانك على المنصة. سيتم مراجعة طلبك والرد عليك في أقرب وقت.</p>
+                
+                <form class="request-form" id="requestForm">
+                    <div class="form-group">
+                        <label for="requesterName">اسم مقدم الطلب <span class="required">*</span></label>
+                        <input type="text" id="requesterName" name="requester_name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="requesterEmail">البريد الإلكتروني <span class="required">*</span></label>
+                        <input type="email" id="requesterEmail" name="requester_email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="surveyTitle">عنوان الاستبيان <span class="required">*</span></label>
+                        <input type="text" id="surveyTitle" name="survey_title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="surveyDescription">وصف الاستبيان <span class="required">*</span></label>
+                        <textarea id="surveyDescription" name="survey_description" rows="5" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="surveyCategory">التصنيف <span class="required">*</span></label>
+                        <select id="surveyCategory" name="category_id" required>
+                            <option value="">اختر التصنيف</option>
+                            <!-- التصنيفات ستُضاف ديناميكيًا -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="surveyLink">رابط الاستبيان <span class="required">*</span></label>
+                        <input type="url" id="surveyLink" name="survey_link" required placeholder="https://forms.google.com/...">
+                        <small>أدخل رابط الاستبيان (Google Forms أو أي منصة أخرى)</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">إرسال الطلب</button>
+                </form>
+
+                <div class="message" id="requestMessage"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>جميع الحقوق محفوظة لمجموع  <span id="currentYear"></span> &copy;</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/request.js"></script>
+</body>
+</html>
