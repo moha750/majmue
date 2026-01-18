@@ -1,3 +1,35 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: fm;
+}
+
+@font-face {
+  font-family: fl;
+  src: url(/fonts/COMM\ -\ Lyon\ Arabic\ Display\ Light.otf);
+}
+
+@font-face {
+  font-family: fr;
+  src: url(/fonts/COMM\ -\ Lyon\ Arabic\ Display\ Regular.otf);
+}
+
+@font-face {
+  font-family: fm;
+  src: url(/fonts/COMM\ -\ Lyon\ Arabic\ Display\ Medium.otf);
+}
+
+@font-face {
+  font-family: fb;
+  src: url(/fonts/COMM\ -\ Lyon\ Arabic\ Display\ Bold.otf);
+}
+
+@font-face {
+  font-family: fbb;
+  src: url(/fonts/COMM\ -\ Lyon\ Arabic\ Display\ Black.otf);
+}
+
 /* ===================================
    لوحة التحكم - الأنماط الخاصة
    =================================== */
