@@ -163,7 +163,7 @@ function renderRequests(requests) {
     if (!tbody) return;
 
     if (requests.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7">لا توجد طلبات</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8">لا توجد طلبات</td></tr>';
         return;
     }
 
@@ -183,6 +183,16 @@ function renderRequests(requests) {
                 <td>${escapeHtml(request.requester_email)}</td>
                 <td>${escapeHtml(request.survey_title)}</td>
                 <td>${request.categories ? escapeHtml(request.categories.name) : 'غير محدد'}</td>
+                <td>
+                    <a href="${escapeHtml(request.survey_link)}" target="_blank" class="survey-link-btn" title="زيارة الاستبيان">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        زيارة
+                    </a>
+                </td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td>
                     <div class="action-buttons">
@@ -223,7 +233,7 @@ async function approveRequest(requestId) {
         const publicSlug = await generateUniqueSlug();
 
         // إنشاء استبيان جديد مع slug
-        const { error: insertError } = await supabase
+        const { data: surveyData, error: insertError } = await supabase
             .from('surveys')
             .insert([{
                 title: request.survey_title,
@@ -233,19 +243,41 @@ async function approveRequest(requestId) {
                 public_slug: publicSlug,
                 click_count: 0,
                 is_active: true
-            }]);
+            }])
+            .select();
 
         if (insertError) throw insertError;
 
-        // تحديث حالة الطلب
+        // تحديث حالة الطلب وربطه بالاستبيان
         const { error: updateError } = await supabase
             .from('survey_requests')
-            .update({ status: 'approved' })
+            .update({ 
+                status: 'approved',
+                survey_id: surveyData[0].id
+            })
             .eq('id', requestId);
 
         if (updateError) throw updateError;
 
-        alert('تمت الموافقة على الطلب ونشر الاستبيان بنجاح!');
+        // إرسال إشعار البريد الإلكتروني
+        const internalLink = `${window.location.origin}/survey.html?s=${publicSlug}`;
+        const emailData = {
+            requester_email: request.requester_email,
+            requester_name: request.requester_name,
+            survey_title: request.survey_title,
+            survey_description: request.survey_description,
+            internal_link: internalLink
+        };
+
+        const emailResult = await sendApprovalEmail(emailData);
+        
+        if (emailResult.success) {
+            alert('تمت الموافقة على الطلب ونشر الاستبيان بنجاح!\nتم إرسال إشعار بالقبول إلى البريد الإلكتروني للمستخدم.');
+        } else {
+            alert('تمت الموافقة على الطلب ونشر الاستبيان بنجاح!\nتحذير: فشل إرسال إشعار البريد الإلكتروني. يرجى التحقق من إعدادات EmailJS.');
+            console.error('Email notification failed:', emailResult.error);
+        }
+
         await loadRequests();
         await loadStatistics();
         await loadPublishedSurveys();
@@ -260,27 +292,141 @@ async function approveRequest(requestId) {
    رفض طلب استبيان
    =================================== */
 
+// متغير لتخزين معرف الطلب المراد رفضه
+let pendingRejectionRequestId = null;
+let pendingRejectionRequestData = null;
+
 async function rejectRequest(requestId) {
-    if (!confirm('هل أنت متأكد من رفض هذا الطلب؟')) {
+    try {
+        // الحصول على بيانات الطلب
+        const { data: request, error: fetchError } = await supabase
+            .from('survey_requests')
+            .select('*')
+            .eq('id', requestId)
+            .single();
+
+        if (fetchError) throw fetchError;
+
+        // حفظ البيانات للاستخدام لاحقاً
+        pendingRejectionRequestId = requestId;
+        pendingRejectionRequestData = request;
+
+        // عرض معلومات الطلب في النافذة المنبثقة
+        document.getElementById('rejectionSurveyTitle').textContent = request.survey_title;
+        document.getElementById('rejectionRequesterName').textContent = request.requester_name;
+        document.getElementById('rejectionReasonText').value = '';
+
+        // فتح النافذة المنبثقة
+        openRejectionModal();
+
+    } catch (error) {
+        console.error('خطأ في تحميل بيانات الطلب:', error);
+        alert('حدث خطأ في تحميل بيانات الطلب');
+    }
+}
+
+// فتح النافذة المنبثقة
+function openRejectionModal() {
+    const modal = document.getElementById('rejectionModal');
+    if (modal) {
+        modal.classList.add('active');
+        // التركيز على حقل النص
+        setTimeout(() => {
+            document.getElementById('rejectionReasonText').focus();
+        }, 300);
+    }
+}
+
+// إغلاق النافذة المنبثقة
+function closeRejectionModal() {
+    const modal = document.getElementById('rejectionModal');
+    if (modal) {
+        modal.classList.remove('active');
+        pendingRejectionRequestId = null;
+        pendingRejectionRequestData = null;
+        document.getElementById('rejectionReasonText').value = '';
+    }
+}
+
+// تأكيد الرفض وإرسال البريد الإلكتروني
+async function confirmRejection() {
+    const rejectionReason = document.getElementById('rejectionReasonText').value.trim();
+
+    // التحقق من إدخال سبب الرفض
+    if (!rejectionReason) {
+        alert('يرجى كتابة سبب الرفض قبل المتابعة');
+        document.getElementById('rejectionReasonText').focus();
+        return;
+    }
+
+    if (rejectionReason.length < 20) {
+        alert('يرجى كتابة سبب مفصل للرفض (على الأقل 20 حرفاً)');
+        document.getElementById('rejectionReasonText').focus();
+        return;
+    }
+
+    if (!pendingRejectionRequestId || !pendingRejectionRequestData) {
+        alert('حدث خطأ: لم يتم العثور على بيانات الطلب');
+        closeRejectionModal();
         return;
     }
 
     try {
-        const { error } = await supabase
+        // تحديث حالة الطلب إلى مرفوض
+        const { error: updateError } = await supabase
             .from('survey_requests')
             .update({ status: 'rejected' })
-            .eq('id', requestId);
+            .eq('id', pendingRejectionRequestId);
 
-        if (error) throw error;
+        if (updateError) throw updateError;
 
-        alert('تم رفض الطلب');
+        // إرسال إشعار البريد الإلكتروني
+        const emailData = {
+            requester_email: pendingRejectionRequestData.requester_email,
+            requester_name: pendingRejectionRequestData.requester_name,
+            survey_title: pendingRejectionRequestData.survey_title
+        };
+
+        const emailResult = await sendRejectionEmail(emailData, rejectionReason);
+
+        // إغلاق النافذة المنبثقة
+        closeRejectionModal();
+
+        if (emailResult.success) {
+            alert('تم رفض الطلب بنجاح!\nتم إرسال إشعار الرفض مع السبب إلى البريد الإلكتروني للمستخدم.');
+        } else {
+            alert('تم رفض الطلب بنجاح!\nتحذير: فشل إرسال إشعار البريد الإلكتروني. يرجى التحقق من إعدادات EmailJS.');
+            console.error('Email notification failed:', emailResult.error);
+        }
+
+        // تحديث البيانات
         await loadRequests();
+        await loadStatistics();
 
     } catch (error) {
         console.error('خطأ في رفض الطلب:', error);
         alert('حدث خطأ في رفض الطلب');
+        closeRejectionModal();
     }
 }
+
+// إغلاق النافذة عند النقر خارجها
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('rejectionModal');
+    if (modal && event.target === modal) {
+        closeRejectionModal();
+    }
+});
+
+// إغلاق النافذة عند الضغط على ESC
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('rejectionModal');
+        if (modal && modal.classList.contains('active')) {
+            closeRejectionModal();
+        }
+    }
+});
 
 /* ===================================
    عرض تفاصيل الطلب
@@ -652,20 +798,28 @@ async function toggleSurveyStatus(surveyId, newStatus) {
    =================================== */
 
 async function deleteSurvey(surveyId) {
-    if (!confirm('هل أنت متأكد من حذف هذا الاستبيان؟')) {
+    if (!confirm('هل أنت متأكد من حذف هذا الاستبيان؟ سيتم حذف الطلب المرتبط به أيضاً.')) {
         return;
     }
 
     try {
-        const { error } = await supabase
+        // حذف الطلب المرتبط أولاً (باستخدام survey_id)
+        await supabase
+            .from('survey_requests')
+            .delete()
+            .eq('survey_id', surveyId);
+
+        // حذف الاستبيان
+        const { error: deleteError } = await supabase
             .from('surveys')
             .delete()
             .eq('id', surveyId);
 
-        if (error) throw error;
+        if (deleteError) throw deleteError;
 
-        alert('تم حذف الاستبيان بنجاح');
+        alert('تم حذف الاستبيان والطلب المرتبط به بنجاح');
         await loadPublishedSurveys();
+        await loadRequests();
         await loadStatistics();
 
     } catch (error) {
@@ -722,11 +876,10 @@ async function generateUniqueSlug() {
         const { data, error } = await supabase
             .from('surveys')
             .select('id')
-            .eq('public_slug', slug)
-            .single();
+            .eq('public_slug', slug);
         
-        // إذا لم يتم العثور على slug مشابه، فهو فريد
-        if (error && error.code === 'PGRST116') {
+        // إذا لم يتم العثور على slug مشابه (data فارغة أو null)، فهو فريد
+        if (!error && (!data || data.length === 0)) {
             isUnique = true;
         }
     }

@@ -256,6 +256,31 @@
     background-color: var(--primary-dark);
 }
 
+/* Survey Link Button */
+.survey-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.survey-link-btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(49, 113, 87, 0.3);
+}
+
+.survey-link-btn svg {
+    flex-shrink: 0;
+}
+
 /* Status Badge */
 .status-badge {
     display: inline-block;
@@ -382,6 +407,157 @@
     color: var(--text-light);
 }
 
+/* Rejection Modal */
+.rejection-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.rejection-modal.active {
+    display: flex;
+}
+
+.rejection-modal-content {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.rejection-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid var(--border-color);
+    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.rejection-modal-header h3 {
+    margin: 0;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.rejection-modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: white;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.rejection-modal-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.rejection-modal-body {
+    padding: 2rem;
+}
+
+.rejection-modal-body p {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.rejection-modal-body .form-group {
+    margin-top: 1.5rem;
+}
+
+.rejection-modal-body label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.rejection-modal-body textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 150px;
+    transition: border-color 0.3s;
+}
+
+.rejection-modal-body textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.rejection-modal-body textarea::placeholder {
+    color: #999;
+}
+
+.rejection-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-color);
+    border-radius: 0 0 12px 12px;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.btn-danger:active {
+    transform: translateY(0);
+}
+
 /* Responsive Design for Admin */
 @media (max-width: 768px) {
     .dashboard-header {
@@ -412,5 +588,24 @@
     .admin-table th,
     .admin-table td {
         padding: 0.75rem 0.5rem;
+    }
+
+    .rejection-modal-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .rejection-modal-header,
+    .rejection-modal-body,
+    .rejection-modal-footer {
+        padding: 1rem;
+    }
+
+    .rejection-modal-footer {
+        flex-direction: column;
+    }
+
+    .rejection-modal-footer button {
+        width: 100%;
     }
 }

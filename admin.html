@@ -65,12 +65,13 @@
                                 <th>البريد</th>
                                 <th>عنوان الاستبيان</th>
                                 <th>التصنيف</th>
+                                <th>رابط الاستبيان</th>
                                 <th>الحالة</th>
                                 <th>الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="requestsTableBody">
-                            <tr><td colspan="7">جاري التحميل...</td></tr>
+                            <tr><td colspan="8">جاري التحميل...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -164,8 +165,33 @@
 
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <!-- JavaScript -->
     <script src="js/config.js"></script>
+    <script src="js/emailService.js"></script>
     <script src="js/admin.js"></script>
+
+    <!-- Rejection Reason Modal -->
+    <div id="rejectionModal" class="rejection-modal">
+        <div class="rejection-modal-content">
+            <div class="rejection-modal-header">
+                <h3>رفض طلب نشر الاستبيان</h3>
+                <button class="rejection-modal-close" onclick="closeRejectionModal()">&times;</button>
+            </div>
+            <div class="rejection-modal-body">
+                <p><strong>عنوان الاستبيان:</strong> <span id="rejectionSurveyTitle"></span></p>
+                <p><strong>مقدم الطلب:</strong> <span id="rejectionRequesterName"></span></p>
+                <div class="form-group">
+                    <label for="rejectionReasonText">سبب الرفض (سيتم إرساله للمستخدم عبر البريد الإلكتروني):</label>
+                    <textarea id="rejectionReasonText" rows="6" placeholder="يرجى كتابة سبب واضح ومفصل لرفض الطلب...&#10;&#10;مثال:&#10;- الاستبيان لا يتوافق مع سياسات المنصة&#10;- المحتوى غير مناسب&#10;- الرابط المقدم غير صالح&#10;- يحتاج إلى تعديلات في الصياغة"></textarea>
+                </div>
+            </div>
+            <div class="rejection-modal-footer">
+                <button class="btn btn-secondary" onclick="closeRejectionModal()">إلغاء</button>
+                <button class="btn btn-danger" onclick="confirmRejection()">تأكيد الرفض وإرسال الإشعار</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

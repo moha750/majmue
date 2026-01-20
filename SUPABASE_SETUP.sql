@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS survey_requests (
     category_id BIGINT REFERENCES categories(id) ON DELETE SET NULL,
     survey_link TEXT NOT NULL,
     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    survey_id BIGINT REFERENCES surveys(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -144,6 +145,7 @@ CREATE INDEX IF NOT EXISTS idx_surveys_public_slug ON surveys(public_slug);
 CREATE INDEX IF NOT EXISTS idx_surveys_is_active ON surveys(is_active);
 CREATE INDEX IF NOT EXISTS idx_survey_requests_status ON survey_requests(status);
 CREATE INDEX IF NOT EXISTS idx_survey_requests_created_at ON survey_requests(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_survey_requests_survey_id ON survey_requests(survey_id);
 CREATE INDEX IF NOT EXISTS idx_contact_messages_created_at ON contact_messages(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_site_visits_date ON site_visits(visit_date);
 
